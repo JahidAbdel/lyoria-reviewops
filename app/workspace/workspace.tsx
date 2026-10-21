@@ -19,9 +19,12 @@ export function Workspace({ email, restaurant, initialImports }: { email: string
   const [message, setMessage] = useState(""), [busy, setBusy] = useState(false);
   const [analysis, setAnalysis] = useState<AnalysisView | null>(null), [selectedImport, setSelectedImport] = useState("");
   async function loadAnalysis(id: string) {
+    setBusy(true); setMessage("Loading saved analysis…");
     const response = await fetch(`/api/imports/${id}/analysis`), result = await response.json();
+    setBusy(false);
     if (!response.ok) { setMessage(result.error || "Result unavailable."); return; }
     setSelectedImport(id); setAnalysis(result); setMessage("");
+    requestAnimationFrame(() => document.getElementById("saved-analysis")?.scrollIntoView({ behavior: "smooth", block: "start" }));
   }
   async function submit(event: React.FormEvent) {
     event.preventDefault(); setBusy(true); setMessage("");

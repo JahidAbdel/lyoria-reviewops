@@ -32,7 +32,7 @@ export function AnalysisPanel({ data, reload }: { data: AnalysisView; reload: ()
   }
   async function copy(value: string) { await navigator.clipboard.writeText(value); setMessage("Reply copied. Nothing was published."); }
   const contentTheme = data.themes.find(theme => theme.kind === "strength");
-  return <section className={`${styles.card} ${styles.analysis}`} aria-busy={busy}><div className={styles.analysisHeader}><div><p className={styles.eyebrow}>EVIDENCE MAP</p><h2>Saved analysis</h2></div><small>Grounding validated · {data.run.model} · {((data.run.duration_ms ?? 0) / 1000).toFixed(1)} s</small></div>
+  return <section id="saved-analysis" className={`${styles.card} ${styles.analysis}`} aria-busy={busy}><div className={styles.analysisHeader}><div><p className={styles.eyebrow}>EVIDENCE MAP</p><h2>Saved analysis</h2></div><small>Grounding validated · {data.run.model} · {((data.run.duration_ms ?? 0) / 1000).toFixed(1)} s</small></div>
     <p className={styles.formula}>Priority: 50% frequency, 35% severity, and 15% recency. It helps rank findings; it does not replace judgment.</p>
     <p role="status">{message}</p>
     <div className={styles.themeGrid}>{data.themes.map(theme => <article className={styles.theme} key={theme.id}><div className={styles.score}>{theme.priority_score}</div><div><span className={styles.tag}>{theme.kind === "issue" ? "Needs attention" : "Strength"}</span><h3>{theme.title}</h3><p>{theme.suggested_action}</p><small>{theme.frequency_count} evidence item(s) · severity {theme.severity}/5 · confidence {Math.round(theme.confidence * 100)} %</small>
