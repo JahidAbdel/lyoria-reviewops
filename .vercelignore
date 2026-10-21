@@ -1,0 +1,12 @@
+.git/
+.vercel/
+.env*
+node_modules/
+.next/
+.next-dev/
+out/
+application/
+webftp-lyoria/
+*.log
+*.tsbuildinfo
+.DS_Store

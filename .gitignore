@@ -1,0 +1,34 @@
+# Dependencies
+node_modules/
+
+# Next.js build output
+.next/
+.next-dev/
+out/
+webftp-lyoria/
+output/
+tmp/
+
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+pnpm-debug.log*
+
+# macOS and editor files
+.DS_Store
+.idea/
+.vscode/
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Vercel local project metadata
+.vercel/
+
+# Local development tools
+.codex/
+graphify-out/
