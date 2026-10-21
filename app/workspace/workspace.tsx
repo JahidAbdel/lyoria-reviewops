@@ -18,13 +18,13 @@ export function Workspace({ email, restaurant, initialImports }: { email: string
   const [label, setLabel] = useState(""), [source, setSource] = useState<"paste" | "csv" | "example">("paste"), [content, setContent] = useState("");
   const [message, setMessage] = useState(""), [busy, setBusy] = useState(false);
   const [analysis, setAnalysis] = useState<AnalysisView | null>(null), [selectedImport, setSelectedImport] = useState("");
-  async function loadAnalysis(id: string) {
+  async function loadAnalysis(id: string, reveal = true) {
     setBusy(true); setMessage("Loading saved analysis…");
     const response = await fetch(`/api/imports/${id}/analysis`), result = await response.json();
     setBusy(false);
     if (!response.ok) { setMessage(result.error || "Result unavailable."); return; }
     setSelectedImport(id); setAnalysis(result); setMessage("");
-    requestAnimationFrame(() => document.getElementById("saved-analysis")?.scrollIntoView({ behavior: "smooth", block: "start" }));
+    if (reveal) requestAnimationFrame(() => document.getElementById("saved-analysis")?.scrollIntoView({ behavior: "smooth", block: "start" }));
   }
   async function submit(event: React.FormEvent) {
     event.preventDefault(); setBusy(true); setMessage("");
@@ -73,6 +73,6 @@ export function Workspace({ email, restaurant, initialImports }: { email: string
         {initialImports.length === 0 ? <p>No saved imports yet.</p> : <ul className={styles.list}>{initialImports.map(item => <li key={item.id}><div><strong>{item.label}</strong><span>{item.period_start} → {item.period_end} · {item.reviews[0]?.count ?? 0} reviews · {item.source}</span></div><span className={styles.rowActions}><button disabled={busy} onClick={() => analyze(item.id)}>Analyze</button><button disabled={busy} className={styles.quiet} onClick={() => loadAnalysis(item.id)}>View</button><button disabled={busy} className={styles.danger} onClick={() => remove(item.id)}>Delete</button></span></li>)}</ul>}
       </section>
     </div>
-    {analysis && <AnalysisPanel data={analysis} reload={() => loadAnalysis(selectedImport)} />}
+    {analysis && <AnalysisPanel data={analysis} reload={() => loadAnalysis(selectedImport, false)} />}
   </main>;
 }
