@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
@@ -14,6 +14,7 @@ const example = "2026-10-01 | 5 | Warm welcome and delicious food.\n2026-10-03 |
 
 export function Workspace({ email, restaurant, initialImports }: { email: string; restaurant: Restaurant; initialImports: ImportRow[] }) {
   const router = useRouter();
+  const fileInput = useRef<HTMLInputElement>(null);
   const [name, setName] = useState(restaurant?.name ?? ""), [facts, setFacts] = useState(restaurant?.facts ?? ""), [tone, setTone] = useState(restaurant?.reply_tone ?? "warm");
   const [label, setLabel] = useState(""), [source, setSource] = useState<"paste" | "csv" | "example">("paste"), [content, setContent] = useState("");
   const [message, setMessage] = useState(""), [busy, setBusy] = useState(false);
@@ -34,7 +35,7 @@ export function Workspace({ email, restaurant, initialImports }: { email: string
       const response = await fetch("/api/imports", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(input) });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || "Could not import reviews.");
-      setLabel(""); setContent(""); setMessage("Import saved."); router.refresh();
+      setLabel(""); setContent(""); if (fileInput.current) fileInput.current.value = ""; setMessage("Import saved."); router.refresh();
     } catch (error) { setMessage(error instanceof Error ? error.message : "Could not import reviews."); }
     finally { setBusy(false); }
   }
@@ -62,7 +63,7 @@ export function Workspace({ email, restaurant, initialImports }: { email: string
           <label>Reply tone<select value={tone} onChange={event => setTone(event.target.value)}><option value="warm">Warm</option><option value="formal">Formal</option><option value="concise">Concise</option></select></label>
           <label>Import name<input required maxLength={120} placeholder="October reviews" value={label} onChange={event => setLabel(event.target.value)} /></label>
           <label>Format<select value={source} onChange={event => setSource(event.target.value as typeof source)}><option value="paste">Pasted text</option><option value="csv">CSV file</option><option value="example">Fictional example</option></select></label>
-          {source === "csv" && <label>CSV file<input required type="file" accept=".csv,text/csv" onChange={async event => setContent(await event.target.files?.[0]?.text() ?? "")} /></label>}
+          {source === "csv" && <label>CSV file<input ref={fileInput} required type="file" accept=".csv,text/csv" onChange={async event => setContent(await event.target.files?.[0]?.text() ?? "")} /></label>}
           {source !== "csv" && <label>Reviews<textarea required rows={7} value={content} onChange={event => setContent(event.target.value)} placeholder="2026-10-01 | 4 | Review text" /></label>}
           {source === "example" && <button type="button" className={styles.quiet} onClick={() => { setContent(example); setLabel("October example"); }}>Load example</button>}
           <small>Maximum 15 reviews and 500 KB. CSV columns: date, rating, text; id and language are optional.</small>
