@@ -14,5 +14,6 @@ export async function GET(_request: Request, context: { params: Promise<{ id: st
     supabase.from("themes").select("id,title,kind,suggested_action,evidence,frequency_count,severity,confidence,priority_score,actions(id,title,status,target_description,baseline_value,target_value,starts_on)").eq("analysis_run_id", run.id).order("priority_score", { ascending: false }),
     supabase.from("reply_drafts").select("id,content,verification_question,status,review_id,reviews(external_id,rating,text)").eq("analysis_run_id", run.id)
   ]);
-  return NextResponse.json({ run, themes: themes ?? [], replies: replies ?? [] }, { headers: { "Cache-Control": "no-store" } });
+  const orderedReplies = (replies ?? []).sort((left, right) => (left.reviews?.external_id ?? "").localeCompare(right.reviews?.external_id ?? ""));
+  return NextResponse.json({ run, themes: themes ?? [], replies: orderedReplies }, { headers: { "Cache-Control": "no-store" } });
 }
